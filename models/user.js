@@ -1,4 +1,4 @@
-import {database} from 'sequelize';
+import {DataTypes} from 'sequelize';
 import sequelize from '../config/database.js';
 
 const User = sequelize.define('User',{
@@ -20,8 +20,8 @@ const User = sequelize.define('User',{
     password:{
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true
     },
+
     es_validaor: { 
         type: DataTypes.BOOLEAN,
         defaultValue: false 
