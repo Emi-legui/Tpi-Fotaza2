@@ -1,5 +1,5 @@
-import sequelize from './config/database.js';
-import User from './models/user.js';
+import sequelize from '../config/database.js';
+import User from '../models/user.js';
 
 async function sincronizarBaseDeDatos() {
     try {
