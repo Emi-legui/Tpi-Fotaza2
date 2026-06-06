@@ -44,7 +44,7 @@ router.get('/', async (req, res) => {
         });
     }
     //Editar una publicacion
-    router.put('/update/:id', async (req, res) => {
+    router.put('/:id', async (req, res) => {
         try{
             const {id} = req.params;
             const {titulo, descripcion} = req.body;
