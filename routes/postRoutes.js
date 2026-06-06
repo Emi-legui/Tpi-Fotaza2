@@ -43,5 +43,29 @@ router.get('/', async (req, res) => {
             message: error.message
         });
     }
+    //Editar una publicacion
+    router.put('/update/:id', async (req, res) => {
+        try{
+            const {id} = req.params;
+            const {titulo, descripcion} = req.body;
+
+            //buscamos la publicacion y lo actualizamon
+            const postActualizado = await Post.update(
+                {titulo, descripcion},
+                {where: {id : id}}
+            );
+            if(postActualizado[0] === 0){
+                return res.status(404).json({error: 'Publicacion no encontrada'});
+            }
+            res.json({message: 'Publicacion actualizada con exito'});
+
+        }catch(error){
+            res.status(500).json({
+                error: 'Error al actualizar la publicacion',
+                message: error.message
+            });
+        }
+    });
 });
-export default router;
+
+     export default router;
