@@ -7,9 +7,9 @@ router.post('/', async (req, res) => {
         const {contenido, id_post, id_autor} = req.body;
 
         const nuevoComentario = await Comment.create({
-            contenido,
-            id_usuario,
-            id_publicacion
+            contenido: contenido,
+            id_publicacion: id_post,
+            id_usuario: id_autor
         });
         res.status(201).json({
             message: 'Comentario creado con exito',
