@@ -67,4 +67,26 @@ router.get('/', async (req, res) => {
             });
         }
     });
+    //Eliminar una publicacion
+    router.delete('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const postEliminado = await Post.destroy({
+            where: { id: id }
+        });
+
+        if (postEliminado === 0) {
+            return res.status(404).json({ error: "Publicacion no encontrada" });
+        }
+
+        res.json({ message: "Publicacion eliminada con exito" });
+        
+    } catch (error) {
+        res.status(500).json({ 
+            error: "Error al borrar la publicacion", 
+            message: error.message 
+        });
+    }
+});
      export default router;
