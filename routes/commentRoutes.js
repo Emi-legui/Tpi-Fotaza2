@@ -2,7 +2,7 @@ import express from 'express';
 import Comment from '../models/comment.js';
 
 const router = express.Router();
-router.post('/create', async (req, res) => {
+router.post('/', async (req, res) => {
     try{
         const {contenido, id_post, id_autor} = req.body;
 
