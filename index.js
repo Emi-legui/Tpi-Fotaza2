@@ -2,8 +2,10 @@ import express from 'express';
 import sequelize from './config/database.js';
 import User from './models/user.js';
 import Post from './models/post.js';
+import Comment from './models/comment.js';
 import userRoutes from './routes/userRoutes.js';
 import postRoutes from './routes/postRoutes.js';
+import commentRoutes from './routes/commentRoutes.js';
 
 const app = express();
 
@@ -11,6 +13,7 @@ app.use(express.json());
 
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/comments', commentRoutes);
 
 // Iniciamos la conexion con la base de datos
 sequelize.sync({ force: false })
