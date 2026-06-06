@@ -43,6 +43,7 @@ router.get('/', async (req, res) => {
             message: error.message
         });
     }
+});
     //Editar una publicacion
     router.put('/:id', async (req, res) => {
         try{
@@ -66,6 +67,4 @@ router.get('/', async (req, res) => {
             });
         }
     });
-});
-
      export default router;
