@@ -1,5 +1,6 @@
 import express from 'express';
 import Post from '../models/Post.js';
+import { verificarEstadoPublicacion } from '../controllers/postController.js';
 
 //Creamos un router 
 // para agrupar todas las rutas relacionadas con los posts(publicaciones)
@@ -49,6 +50,17 @@ router.get('/', async (req, res) => {
         try{
             const {id} = req.params;
             const {titulo, descripcion} = req.body;
+
+            // 1. Verificamos si el post tiene 3 o mas denuncias pendientes
+        const estaBloqueado = await verificarEstadoPublicacion(id);
+        
+        // 2. Si esta bloqueado, impedimos la edicion y respondemos con error
+        if (estaBloqueado) {
+            return res.status(403).json({ 
+                error: 'No se puede editar', 
+                message: 'La publicacion tiene demasiadas denuncias y esta bloqueada para revision' 
+            });
+        }
 
             //buscamos la publicacion y lo actualizamon
             const postActualizado = await Post.update(
