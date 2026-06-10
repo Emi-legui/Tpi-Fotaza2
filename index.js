@@ -7,6 +7,7 @@ import userRoutes from './routes/userRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
 import denunciaRoutes from './routes/denunciaRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/denuncias', denunciaRoutes);
+app.use('/api/auth', authRoutes);
 
 // Iniciamos la conexion con la base de datos
 sequelize.sync({ force: false })
