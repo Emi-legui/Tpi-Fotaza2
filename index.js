@@ -3,6 +3,7 @@ import sequelize from './config/database.js';
 import User from './models/user.js';
 import Post from './models/post.js';
 import Comment from './models/comment.js';
+import Denuncia from './models/denuncia.js';
 import userRoutes from './routes/userRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
@@ -18,6 +19,9 @@ app.set('views', './views');
 // Middleware para parsear JSON y datos de formularios
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+//Carpeta publica para archivos estáticos (CSS, JS, imágenes)
+app.use(express.static('public'));
 
 // Rutas
 app.use('/api/users', userRoutes);
