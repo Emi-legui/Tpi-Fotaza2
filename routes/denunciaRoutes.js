@@ -1,5 +1,6 @@
 import express from 'express';
 import Denuncia from '../models/denuncia.js';
+import { obtenerDenunciasPendientes } from '../controllers/postController.js';
 
 const router = express.Router();
 
@@ -28,5 +29,7 @@ router.post('/', async (req, res) => {
         });
     }
 });
+
+router.get('/pendientes', obtenerDenunciasPendientes);
 
 export default router;
