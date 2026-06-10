@@ -22,7 +22,7 @@ export async function login(req, res) {
 
         // 3. Si todo es correcto, generamos un Token
         const token = jwt.sign(
-            { id: user.id, es_validador: user.es_validaor }, 
+            { id: user.id, es_validador: user.es_validador }, 
             SECRET_KEY, 
             { expiresIn: '1h' } // El token expira en 1 hora
         );
