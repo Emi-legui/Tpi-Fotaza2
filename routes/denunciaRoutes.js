@@ -1,6 +1,6 @@
 import express from 'express';
 import Denuncia from '../models/denuncia.js';
-import { obtenerDenunciasPendientes } from '../controllers/postController.js';
+import { obtenerDenunciasPendientes, resolverDenuncia } from '../controllers/postController.js';
 import { esValidador, verificarToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
