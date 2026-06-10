@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import express from 'express';
 import sequelize from './config/database.js';
 import User from './models/user.js';
@@ -19,6 +20,7 @@ app.set('views', './views');
 // Middleware para parsear JSON y datos de formularios
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 //Carpeta publica para archivos estáticos (CSS, JS, imágenes)
 app.use(express.static('public'));
