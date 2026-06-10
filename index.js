@@ -27,9 +27,9 @@ app.use('/api/denuncias', denunciaRoutes);
 app.use('/api/auth', authRoutes);
 
 // Iniciamos la conexion con la base de datos
-sequelize.sync({ force: true})
+sequelize.sync()
     .then(() => {
-        console.log('base de datos borrada y sincronizada desde cero.');
+        console.log('base de datos sincronizada.');
         
         const PORT = 3000;
         app.listen(PORT, () => {
