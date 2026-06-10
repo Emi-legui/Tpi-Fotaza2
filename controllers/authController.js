@@ -4,6 +4,27 @@ import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 
 const SECRET_KEY = process.env.JWT_SECRET;
+
+//Funcion de registro
+export async function register(req, res) {
+    try {
+        const { username, email, password } = req.body;
+
+        // Creamos el usuario. El hook 'beforeCreate' del modelo se encarga de encriptar el password automáticamente.
+        const newUser = await User.create({ 
+            username,
+            email,
+            password 
+        });
+
+        res.status(201).json({ message: 'Usuario registrado exitosamente', user: newUser });
+
+    } catch (error) {
+        res.status(400).json({ error: 'Error al registrar el usuario', message: error.message });
+    }
+}
+
+//Funcion de login
 export async function login(req, res) {
     try {
         const { email, password } = req.body;
