@@ -46,8 +46,8 @@ export async function login(req, res) {
 
         //4. Guardamos el token en una cookie segura
         res.cookie('token',token, {
-            httpOnly: true //evita que el token sea accesible dede js
-            secure: process.env.NODE_ENV === 'production' // Solo se envía en HTTPS en producción
+            httpOnly: true, //evita que el token sea accesible dede js
+            secure: process.env.NODE_ENV === 'production', // Solo se envía en HTTPS en producción
             maxAge: 3600000 // El token expira en 1 hora (en milisegundos)
         });
         //5. Redireccionamos al feed de publicaciones
