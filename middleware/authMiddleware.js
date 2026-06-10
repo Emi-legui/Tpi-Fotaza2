@@ -1,27 +1,31 @@
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 
-//verifica si el token extiste y es valido
-export const verificarToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Formato: "Bearer TOKEN"
+const SECRET_KEY = process.env.JWT_SECRET;
 
-    if (!token) return res.status(401).json({ error: 'Acceso denegado. Token no proporcionado.' });
+//verifica si el token extiste y es valido
+export const requiereAutenticacion = (req, res, next) => {
+
+// Intentamos leer la cookie del token que guardamos en el login
+    const token = req.cookies.token;
+
+    // Si no existe la cookie, lo mandamos derecho al login
+    if (!token) {
+        return res.redirect('/auth/login');
+    }
 
     try {
-        const verificado = jwt.verify(token, process.env.JWT_SECRET);
-        req.usuario = verificado; // Guardamos los datos del usuario en la petición
-        next(); // Continuamos a la siguiente función
+        //  Verificamos si el token es valido y no expiro
+        const datosDecodificados = jwt.verify(token, SECRET_KEY);
+        
+        // Inyectamos los datos del usuario dentro del pedido ('req') para que los controladores los usen
+        req.usuario = datosDecodificados; 
+        
+        // Todo OK, dejamos que continúe a la ruta que quería entrar
+        next();
     } catch (error) {
-        res.status(403).json({ error: 'Token inválido' });
+        // Si el token es invalido o expiro, limpiamos la cookie y al login
+        res.clearCookie('token');
+        return res.redirect('/auth/login');
     }
-};
-
-// Middleware para verificar si es validador
-export const esValidador = (req, res, next) => {
-    if (req.usuario && req.usuario.es_validador) {
-        next(); // Es validador, puede pasar
-    } else {
-        res.status(403).json({ error: 'Acceso denegado. Requiere rol de validador.' });
-    }
-};
+    };
