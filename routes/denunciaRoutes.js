@@ -30,7 +30,10 @@ router.post('/', async (req, res) => {
         });
     }
 });
-
+//Ruta para obtener denuncias pendientes
 router.get('/pendientes', verificarToken, esValidador , obtenerDenunciasPendientes);
+
+// Ruta para resolver una denuncia
+router.put('/resolver/:id', verificarToken, esValidador, resolverDenuncia);
 
 export default router;
