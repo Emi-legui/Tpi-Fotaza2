@@ -3,6 +3,7 @@ import User from '../models/user.js';
 import bcrypt from 'bcrypt';
 
 const router = express.Router();
+
 // Ruta para crear un nuevo usuario (Ruta Post para registro)
 router.post('/register', async (req, res) => {
     try {
@@ -27,8 +28,11 @@ router.post('/register', async (req, res) => {
 //Nos ayuda para poder ver la lista completa
 router.get('/', async (req, res) => {
     try{
-        const users = await User.findAll(); //Busca todos los usuarios en la base de datos
-        res.status(200).json(users);
+        //Busca todos los usuarios en la base de datos
+        const users = await User.findAll(); 
+        // Renderiza la vista 'users' y le pasa la lista de usuarios
+        res.render('users', { users }); 
+
     } catch (error) {
         res.status(500).json({error: 'Error al obtener los usuarios', message: error.message });
     }

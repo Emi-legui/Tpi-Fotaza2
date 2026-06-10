@@ -9,8 +9,15 @@ import commentRoutes from './routes/commentRoutes.js';
 
 const app = express();
 
-app.use(express.json());
+// Configuración de Pug como motor de plantillas
+app.set('view engine', 'pug');
+app.set('views', './views');
 
+// Middleware para parsear JSON y datos de formularios
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Rutas
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/comments', commentRoutes);
