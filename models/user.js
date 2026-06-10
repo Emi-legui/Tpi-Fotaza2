@@ -1,7 +1,7 @@
 import {DataTypes} from 'sequelize';
 import sequelize from '../config/database.js';
 import bcrypt from 'bcryptjs';
-import { Hooks } from 'sequelize/lib/hooks';
+
 
 const User = sequelize.define('User',{
     id:{
@@ -31,21 +31,18 @@ const User = sequelize.define('User',{
     esta_activo: {
         type: DataTypes.BOOLEAN,
         defaultValue: true 
-    },
-    Hooks: {
-        //antes de crear o actualizar un usuario, se encripta la contraseña
-        beforeCreate: async (user) => {
-            const salt = await bcrypt.genSalt(10);
-            user.password = await bcrypt.hash(user.password, salt);
-        },
-
-        beforeUpdate: async (user) => {
-            if(user.changed('password')) {
-                const salt = await bcrypt.genSalt(10);
-                user.password = await bcrypt.hash(user.password, salt);
-            }
-        }
-    }
-
+    },  
 });
+User.beforeCreate(async (user) => {
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(user.password, salt);
+});
+
+User.beforeUpdate(async (user) => {
+    if (user.changed('password')) {
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(user.password, salt);
+    }
+});
+
 export default User;
