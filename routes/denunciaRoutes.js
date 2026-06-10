@@ -1,6 +1,7 @@
 import express from 'express';
 import Denuncia from '../models/denuncia.js';
 import { obtenerDenunciasPendientes } from '../controllers/postController.js';
+import { esValidador, verificarToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -30,6 +31,6 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.get('/pendientes', obtenerDenunciasPendientes);
+router.get('/pendientes', verificarToken, esValidador , obtenerDenunciasPendientes);
 
 export default router;

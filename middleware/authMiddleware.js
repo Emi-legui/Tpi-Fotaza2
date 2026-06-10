@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 
+//verifica si el token extiste y es valido
 export const verificarToken = (req, res, next) => {
-    // Obtenemos el token del header "Authorization"
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1]; // Formato: "Bearer TOKEN"
 

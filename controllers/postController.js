@@ -32,3 +32,25 @@ export async function obtenerDenunciasPendientes(req, res) {
         });
     }
 }
+// Cambia el estado de una denuncia
+export async function resolverDenuncia(req, res) {
+    try {
+        const { id } = req.params;
+        const { estado } = req.body; // Se espera 'aprobada' o 'rechazada'
+
+        const denuncia = await Denuncia.findByPk(id);
+        if (!denuncia) {
+            return res.status(404).json({ error: 'Denuncia no encontrada' });
+        }
+
+        denuncia.estado = estado;
+        await denuncia.save();
+
+        res.json({ message: 'Denuncia actualizada correctamente', denuncia });
+    } catch (error) {
+        res.status(500).json({ 
+            error: 'Error al actualizar denuncia', 
+            message: error.message 
+        });
+    }
+}
