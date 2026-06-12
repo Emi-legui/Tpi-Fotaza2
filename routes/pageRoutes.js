@@ -166,8 +166,7 @@ router.get('/posts/:id', opcionalAutenticacion, async (req, res) => {
                 { model: Tag, attributes: ['id', 'nombre'], through: { attributes: [] } },
                 { 
                     model: Comment, 
-                    include: [{ model: User, attributes: ['id', 'username'] }],
-                    order: [['fecha_creacion', 'ASC']]
+                    include: [{ model: User, attributes: ['id', 'username'] }]
                 },
                 { model: Valoracion }
             ]
@@ -178,6 +177,11 @@ router.get('/posts/:id', opcionalAutenticacion, async (req, res) => {
         }
 
         const postJson = post.toJSON();
+
+        // Ordenar comentarios por fecha de creación de forma segura
+        if (postJson.Comments) {
+            postJson.Comments.sort((a, b) => new Date(a.fecha_creacion) - new Date(b.fecha_creacion));
+        }
 
         // Calcular promedio y cantidad de votos
         const valoraciones = postJson.Valoracions || [];
