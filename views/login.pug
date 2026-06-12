@@ -1,0 +1,30 @@
+extends layout
+
+block content
+  .form-container
+    h2.form-title ¡Bienvenido de nuevo!
+    p.form-subtitle Ingresa tus credenciales para acceder a Fotaza 2
+    
+    if error
+      .error-box
+        i.fa-solid.fa-triangle-exclamation
+        |  #{error}
+        if message
+          span.block(style="display: block; margin-top: 0.25rem; font-size: 0.8rem; opacity: 0.8;") #{message}
+
+    form(action="/api/auth/login" method="POST")
+      .form-group
+        label.form-label(for="email") Correo Electrónico
+        input#email.form-input(type="email" name="email" placeholder="ejemplo@correo.com" required)
+      
+      .form-group
+        label.form-label(for="password") Contraseña
+        input#password.form-input(type="password" name="password" placeholder="••••••••" required)
+      
+      button.btn-primary(type="submit" style="width: 100%; margin-top: 1rem;") 
+        i.fa-solid.fa-right-to-bracket
+        |  Iniciar Sesión
+        
+    .form-footer
+      p ¿No tienes una cuenta aún? 
+        a(href="/register") Regístrate aquí

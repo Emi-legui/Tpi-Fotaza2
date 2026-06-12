@@ -1,0 +1,89 @@
+extends layout
+
+block content
+  .feed-header
+    .feed-title-container
+      h1 🌌 Explorar Galería
+      p Encuentra, comparte y valora fotografías artísticas de alta calidad
+
+    //- Panel de búsqueda y filtrado
+    .search-filter-container
+      form.search-form(action="/posts" method="GET")
+        .search-input-wrapper
+          input.search-input(type="text" name="q" placeholder="Buscar por título o descripción..." value=query.q || '')
+        button.btn-primary(type="submit")
+          i.fa-solid.fa-magnifying-glass
+          |  Buscar
+
+      .filter-row
+        //- Filtro por Licencia
+        form(action="/posts" method="GET" style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;")
+          //- Mantener el parámetro de búsqueda si existe
+          if query.q
+            input(type="hidden" name="q" value=query.q)
+          if query.tag
+            input(type="hidden" name="tag" value=query.tag)
+          
+          select.filter-select(name="licencia" onchange="this.form.submit()")
+            option(value="" selected=!query.licencia) Todas las licencias
+            option(value="libre" selected=query.licencia === 'libre') Libre de Copyright
+            if usuario
+              option(value="copyright" selected=query.licencia === 'copyright') Con Copyright
+          
+          select.filter-select(name="rating" onchange="this.form.submit()")
+            option(value="" selected=!query.rating) Calificación (Cualquiera)
+            option(value="4" selected=query.rating === '4') 4★ o más
+            option(value="3" selected=query.rating === '3') 3★ o más
+            option(value="2" selected=query.rating === '2') 2★ o más
+
+          if usuario
+            label.filter-select(style="display: flex; align-items: center; gap: 0.5rem; user-select: none; font-size: 0.9rem;")
+              input(type="checkbox" name="following" value="true" checked=query.following === 'true' onchange="this.form.submit()")
+              |  Solo usuarios que sigo
+
+          a.btn-secondary(href="/posts" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;") Reestablecer
+
+      //- Filtros rápidos por Etiquetas
+      if tags && tags.length > 0
+        .quick-tags
+          span(style="font-size: 0.85rem; color: var(--text-secondary); align-self: center;") Etiquetas populares:
+          each t in tags
+            a.tag-badge(href=`/posts?tag=${t.nombre}${query.licencia ? '&licencia=' + query.licencia : ''}${query.rating ? '&rating=' + query.rating : ''}` class=(query.tag === t.nombre ? 'active' : ''))
+              | ##{t.nombre}
+
+  //- Listado de fotos
+  if posts && posts.length > 0
+    .gallery-grid
+      each post in posts
+        article.post-card
+          a.post-image-container(href=`/posts/${post.id}`)
+            img.post-image(src=post.imagen alt=post.titulo loading="lazy")
+            span.license-tag(class=post.licencia)
+              if post.licencia === 'copyright'
+                i.fa-solid.fa-copyright
+                |  Copyright
+              else
+                i.fa-solid.fa-lock-open
+                |  Libre
+          
+          .post-content
+            a.post-card-title(href=`/posts/${post.id}` title=post.titulo)= post.titulo
+            
+            .post-author
+              a.post-author-name(href=`/profile/${post.id_autor}`) @#{post.User ? post.User.username : 'anónimo'}
+              if post.cantidadValoraciones > 0
+                span.post-rating-badge(title=`${post.cantidadValoraciones} valoraciones`)
+                  i.fa-solid.fa-star
+                  |  #{post.promedioValoracion}
+              else
+                span(style="font-size: 0.75rem; color: var(--text-muted);") Sin calificar
+                
+            if post.Tags && post.Tags.length > 0
+              .post-tags-list
+                each t in post.Tags
+                  a.post-tag-item(href=`/posts?tag=${t.nombre}`) ##{t.nombre}
+  else
+    div(style="text-align: center; padding: 4rem 2rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); margin-top: 2rem;")
+      i.fa-solid.fa-cloud-moon(style="font-size: 3.5rem; color: var(--text-muted); margin-bottom: 1.5rem; display: block;")
+      h2 No se encontraron imágenes
+      p.text-secondary(style="margin-top: 0.5rem;") Prueba a cambiar los filtros de búsqueda o restablecer la galería.

@@ -1,0 +1,35 @@
+extends layout
+
+block content
+  .form-container
+    h2.form-title Crear una Cuenta
+    p.form-subtitle Únete a la comunidad de fotógrafos de Fotaza 2
+    
+    if error
+      .error-box
+        i.fa-solid.fa-triangle-exclamation
+        |  #{error}
+        if message
+          span.block(style="display: block; margin-top: 0.25rem; font-size: 0.8rem; opacity: 0.8;") #{message}
+
+    form(action="/api/auth/register" method="POST")
+      .form-group
+        label.form-label(for="username") Nombre de Usuario
+        input#username.form-input(type="text" name="username" placeholder="nombre_usuario" required)
+      
+      .form-group
+        label.form-label(for="email") Correo Electrónico
+        input#email.form-input(type="email" name="email" placeholder="ejemplo@correo.com" required)
+      
+      .form-group
+        label.form-label(for="password") Contraseña
+        input#password.form-input(type="password" name="password" placeholder="••••••••" required)
+        p.form-help Mínimo 6 caracteres. Será encriptada de forma segura.
+      
+      button.btn-primary(type="submit" style="width: 100%; margin-top: 1rem;") 
+        i.fa-solid.fa-user-plus
+        |  Registrarme
+        
+    .form-footer
+      p ¿Ya tienes cuenta? 
+        a(href="/login") Inicia sesión aquí

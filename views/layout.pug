@@ -1,0 +1,68 @@
+doctype html
+html(lang="es")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title #{title || 'Fotaza 2'}
+    link(rel="stylesheet" href="/css/style.css")
+    //- FontAwesome para iconos
+    link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css")
+  body
+    header
+      nav.navbar
+        a.nav-brand(href="/posts")
+          i.fa-solid.fa-camera-retro
+          | Fotaza 
+          span 2
+        
+        ul.nav-menu
+          li.nav-item
+            a(href="/posts")
+              i.fa-solid.fa-images
+              |  Explorar
+          if usuario
+            li.nav-item.btn-upload
+              a(href="/posts/create")
+                i.fa-solid.fa-circle-plus
+                |  Subir Foto
+            li.nav-item
+              a(href="/collections")
+                i.fa-solid.fa-folder-heart
+                |  Colecciones
+            li.nav-item
+              a(href="/messages")
+                i.fa-solid.fa-paper-plane
+                |  Mensajes
+            li.nav-item
+              a(href="/notifications")
+                i.fa-solid.fa-bell
+                |  Notificaciones
+            if usuario.es_validador
+              li.nav-item
+                a(href="/validator")
+                  span.validator-badge
+                    i.fa-solid.fa-shield-halved
+                    |  Validador
+          
+        .nav-user
+          if usuario
+            a.nav-item(href="/my-profile")
+              span.user-tag
+                i.fa-solid.fa-user
+                |  @#{usuario.username || 'perfil'}
+            a.btn-secondary(href="/logout")
+              i.fa-solid.fa-right-from-bracket
+              |  Salir
+          else
+            a.btn-secondary(href="/login")
+              i.fa-solid.fa-right-to-bracket
+              |  Ingresar
+            a.btn-primary(href="/register")
+              i.fa-solid.fa-user-plus
+              |  Registrarse
+
+    main.app-container
+      block content
+
+    footer(style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border-color); margin-top: auto;")
+      p &copy; #{new Date().getFullYear()} Fotaza 2 - Programación Web II. Todos los derechos reservados.
