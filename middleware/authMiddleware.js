@@ -3,29 +3,46 @@ import 'dotenv/config';
 
 const SECRET_KEY = process.env.JWT_SECRET;
 
-//verifica si el token extiste y es valido
+// Middleware para rutas que requieren estar logueado
 export const requiereAutenticacion = (req, res, next) => {
-
-// Intentamos leer la cookie del token que guardamos en el login
     const token = req.cookies.token;
 
-    // Si no existe la cookie, lo mandamos derecho al login
     if (!token) {
-        return res.redirect('/auth/login');
+        return res.redirect('/login');
     }
 
     try {
-        //  Verificamos si el token es valido y no expiro
         const datosDecodificados = jwt.verify(token, SECRET_KEY);
-        
-        // Inyectamos los datos del usuario dentro del pedido ('req') para que los controladores los usen
-        req.usuario = datosDecodificados; 
-        
-        // Todo OK, dejamos que continúe a la ruta que quería entrar
+        req.usuario = datosDecodificados;
+        res.locals.usuario = datosDecodificados; // Hace al usuario disponible en las vistas de Pug
         next();
     } catch (error) {
-        // Si el token es invalido o expiro, limpiamos la cookie y al login
         res.clearCookie('token');
-        return res.redirect('/auth/login');
+        return res.redirect('/login');
     }
-    };
+};
+
+// Middleware para rutas exclusivas del validador de contenidos
+export const esValidador = (req, res, next) => {
+    if (!req.usuario || !req.usuario.es_validador) {
+        return res.status(403).render('error', { 
+            message: 'Acceso denegado. Se requiere perfil de Validador de contenidos.' 
+        });
+    }
+    next();
+};
+
+// Middleware opcional para vistas publicas que cambian segun si estas logueado o no
+export const opcionalAutenticacion = (req, res, next) => {
+    const token = req.cookies.token;
+    if (token) {
+        try {
+            const datosDecodificados = jwt.verify(token, SECRET_KEY);
+            req.usuario = datosDecodificados;
+            res.locals.usuario = datosDecodificados;
+        } catch (error) {
+            res.clearCookie('token');
+        }
+    }
+    next();
+};
