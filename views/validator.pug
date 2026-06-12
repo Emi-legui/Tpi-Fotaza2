@@ -1,0 +1,95 @@
+extends layout
+
+block content
+  .feed-header
+    .feed-title-container
+      h1 🛡️ Panel de Validación de Contenidos
+      p Moderación y revisión de publicaciones y comentarios denunciados por la comunidad.
+
+  if denuncias && denuncias.length > 0
+    .validator-table-container
+      table.validator-table
+        thead
+          tr
+            th Fecha
+            th Tipo
+            th Contenido Denunciado
+            th Autor Contenido
+            th Denunciante
+            th Motivo / Justificación
+            th Acciones
+        tbody
+          each d in denuncias
+            tr(id=`denuncia-row-${d.id}`)
+              td #{new Date(d.fecha_denuncia).toLocaleDateString('es-ES')}
+              
+              td
+                if d.id_publicacion
+                  span.user-tag(style="background: rgba(99, 102, 241, 0.1); color: #818CF8; border-color: transparent;") Imagen
+                else
+                  span.validator-badge(style="background: rgba(245, 158, 11, 0.1); color: #F59E0B; border-color: transparent;") Comentario
+                  
+              td
+                if d.id_publicacion
+                  .val-content-preview
+                    img.val-thumb(src=d.Post.imagen alt=d.Post.titulo)
+                    a(href=`/posts/${d.id_publicacion}` style="font-weight: 500; text-decoration: underline;")= d.Post.titulo
+                else if d.id_comentario
+                  div(style="font-style: italic; max-width: 250px; font-size: 0.9rem;")
+                    | "#{d.Comment.contenido}"
+                    br
+                    a(href=`/posts/${d.Comment.id_publicacion}` style="font-size: 0.75rem; text-decoration: underline; color: var(--text-secondary);") Ver publicación asociada
+                    
+              td
+                if d.id_publicacion
+                  a(href=`/profile/${d.Post.id_autor}`) @#{d.Post.User ? d.Post.User.username : 'desconocido'}
+                else if d.id_comentario
+                  a(href=`/profile/${d.Comment.id_usuario}`) @#{d.Comment.User ? d.Comment.User.username : 'desconocido'}
+                  
+              td
+                a(href=`/profile/${d.id_usuario_denunciante}`) @#{d.User ? d.User.username : 'anónimo'}
+                
+              td
+                strong(style="color: var(--warning); display: block; font-size: 0.85rem;")= d.motivo
+                span(style="font-size: 0.8rem; color: var(--text-secondary); max-width: 250px; display: block;")= d.descripcion
+                
+              td
+                .validator-actions-row
+                  button.btn-danger(onclick=`resolverDenuncia(${d.id}, 'bajar')` title="Dar de baja el contenido y penalizar al autor")
+                    i.fa-solid.fa-trash-can
+                    |  Dar de baja
+                  button.btn-success(onclick=`resolverDenuncia(${d.id}, 'desestimar')` title="Desestimar denuncia")
+                    i.fa-solid.fa-circle-xmark
+                    |  Desestimar
+  else
+    div(style="text-align: center; padding: 5rem 2rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); margin-top: 1.5rem;")
+      i.fa-solid.fa-circle-check(style="font-size: 3.5rem; color: var(--success); margin-bottom: 1.5rem; display: block;")
+      h2 Todo al día
+      p.text-secondary(style="margin-top: 0.5rem;") No hay reportes ni denuncias pendientes en la lista de trabajo.
+
+  script.
+    function resolverDenuncia(id, accion) {
+      const confirmMsg = accion === 'bajar' 
+        ? "¿Estás seguro de que deseas dar de baja este contenido? Esta acción lo borrará permanentemente de la plataforma y penalizará al autor." 
+        : "¿Deseas desestimar esta denuncia?";
+
+      if (confirm(confirmMsg)) {
+        fetch(`/api/denuncias/resolver/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accion })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            alert(data.error);
+          } else {
+            alert(data.message);
+            // Remover la fila de la tabla
+            const row = document.getElementById(`denuncia-row-${id}`);
+            if (row) row.remove();
+            window.location.reload(); // Recargar para limpiar el panel si la baja fue global
+          }
+        });
+      }
+    }

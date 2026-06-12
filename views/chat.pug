@@ -1,0 +1,96 @@
+extends layout
+
+block content
+  .chat-container(style="grid-template-columns: 1fr; height: 75vh;")
+    .chat-window
+      //- Cabecera del chat
+      .chat-header
+        a.btn-secondary(href="/messages" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;")
+          i.fa-solid.fa-arrow-left
+          |  Volver
+        
+        div(style="flex-grow: 1;")
+          h3(style="font-size: 1.1rem; font-weight: 600;") Conversación con @#{otroUsuario.username}
+          a.chat-post-preview(href=`/posts/${post.id}`)
+            img.chat-post-thumb(src=post.imagen alt=post.titulo style="width: 24px; height: 24px;")
+            span Negociación por: 
+              strong(style="color: var(--text-primary); text-decoration: underline;") #{post.titulo}
+              
+      //- Listado de mensajes en tiempo real/historial
+      #chat-messages-box.chat-messages
+        if mensajes && mensajes.length > 0
+          each msg in mensajes
+            .message-bubble(class=(msg.id_remitente === usuario.id ? 'sent' : 'received'))
+              p= msg.contenido
+              .message-time #{new Date(msg.fecha_envio).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+        else
+          p(style="text-align: center; color: var(--text-muted); font-size: 0.9rem;") No hay mensajes todavía. Comienza saludando al vendedor.
+
+      //- Barra de escritura
+      form.chat-input-bar(action="/api/messages/send" method="POST" onsubmit="enviarMensajeChat(event, this)")
+        input(type="hidden" name="id_destinatario" value=otroUsuario.id)
+        input(type="hidden" name="id_publicacion" value=post.id)
+        input.chat-input-field(type="text" name="contenido" placeholder="Escribe tu mensaje..." required autocomplete="off")
+        button.btn-primary(type="submit")
+          i.fa-solid.fa-paper-plane
+
+  script.
+    // Hacer scroll automático al final del chat
+    const msgBox = document.getElementById('chat-messages-box');
+    msgBox.scrollTop = msgBox.scrollHeight;
+
+    function enviarMensajeChat(e, form) {
+      e.preventDefault();
+      const action = form.action;
+      const data = {
+        id_destinatario: form.querySelector('[name="id_destinatario"]').value,
+        id_publicacion: form.querySelector('[name="id_publicacion"]').value,
+        contenido: form.querySelector('[name="contenido"]').value
+      };
+
+      fetch(action, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          // Agregar burbuja dinámicamente al chat sin recargar
+          const bubble = document.createElement('div');
+          bubble.className = 'message-bubble sent';
+          
+          const text = document.createElement('p');
+          text.innerText = data.mensaje.contenido;
+          
+          const time = document.createElement('div');
+          time.className = 'message-time';
+          time.innerText = new Date(data.mensaje.fecha_envio).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+          
+          bubble.appendChild(text);
+          bubble.appendChild(time);
+          msgBox.appendChild(bubble);
+          
+          form.reset();
+          msgBox.scrollTop = msgBox.scrollHeight;
+        }
+      });
+    }
+
+    // Auto-recargar el chat cada 3 segundos para recibir nuevos mensajes del otro usuario
+    setInterval(() => {
+      fetch(window.location.pathname, { headers: { 'Accept': 'text/html' } })
+      .then(res => res.text())
+      .then(html => {
+        // Analizar el html recibido y actualizar sólo el contenedor de mensajes
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const newMsgBox = doc.getElementById('chat-messages-box');
+        if (newMsgBox && newMsgBox.children.length !== msgBox.children.length) {
+          msgBox.innerHTML = newMsgBox.innerHTML;
+          msgBox.scrollTop = msgBox.scrollHeight;
+        }
+      });
+    }, 3000);

@@ -1,0 +1,28 @@
+extends layout
+
+block content
+  .feed-header
+    .feed-title-container
+      h1 👥 Comunidad de Fotaza 2
+      p Explora y conoce a otros fotógrafos y validadores de la comunidad
+
+  if users && users.length > 0
+    .gallery-grid
+      each user in users
+        div(style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1rem; box-shadow: var(--shadow-sm);")
+          i.fa-solid.fa-user-astronaut(style="font-size: 2.5rem; color: var(--accent-primary); background: rgba(99, 102, 241, 0.1); padding: 1rem; border-radius: 50%;")
+          
+          div
+            h3(style="font-size: 1.25rem; font-weight: 600;") @#{user.username}
+            if user.es_validador
+              span.validator-badge(style="font-size: 0.75rem; display: inline-block; margin-top: 0.25rem;")
+                i.fa-solid.fa-shield-halved
+                |  Validador
+            else
+              span.user-tag(style="font-size: 0.75rem; display: inline-block; margin-top: 0.25rem;") 
+                i.fa-solid.fa-camera
+                |  Fotógrafo
+                
+          a.btn-secondary(href=`/profile/${user.id}` style="width: 100%; font-size: 0.85rem;") Ver Perfil
+  else
+    p(style="text-align: center; color: var(--text-muted); padding: 3rem;") No hay usuarios registrados actualmente.
