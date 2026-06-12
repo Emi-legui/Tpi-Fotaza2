@@ -103,12 +103,12 @@ async function sincronizarBaseDeDatos() {
                 id_publicacion: post1.id
             },
             {
-                contenido: 'Espectacular toma, ¿usaste un trípode?',
+                contenido: 'Espectacular toma, ¿usaste un tripode?',
                 id_usuario: juan.id,
                 id_publicacion: post1.id
             },
             {
-                contenido: 'Increíble perspectiva y nitidez.',
+                contenido: 'Increible perspectiva y nitidez.',
                 id_usuario: carlos.id,
                 id_publicacion: post2.id
             }
@@ -179,7 +179,7 @@ async function sincronizarBaseDeDatos() {
         });
         console.log('Colecciones y favoritos creados.');
 
-        console.log('¡Base de datos sembrada con éxito!');
+        console.log('¡Base de datos sembrada con exito!');
     } catch (error) {
         console.error('Error al sincronizar/sembrar la base de datos:', error);
     } finally {
