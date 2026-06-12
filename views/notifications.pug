@@ -1,0 +1,79 @@
+extends layout
+
+block content
+  .notifications-container
+    .notifications-header
+      h2 
+        i.fa-solid.fa-bell(style="color: var(--accent-primary); margin-right: 0.5rem;")
+        |  Mis Notificaciones
+      
+      if notificaciones && notificaciones.some(n => !n.leida)
+        button.btn-secondary(onclick="marcarTodasComoLeidas()" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;")
+          i.fa-solid.fa-envelope-open
+          |  Marcar todas como leídas
+
+    if notificaciones && notificaciones.length > 0
+      .notifications-list
+        each n in notificaciones
+          .notification-item(class=n.leida ? '' : 'unread' id=`notif-${n.id}`)
+            .notification-body
+              p.notification-text
+                a(href=`/profile/${n.id_usuario_origen}` style="font-weight: 600; color: #818CF8;") @#{n.UsuarioOrigen ? n.UsuarioOrigen.username : 'alguien'} 
+                if n.tipo_evento === 'comentario'
+                  | comentó en tu publicación 
+                  a(href=`/posts/${n.id_publicacion}` style="font-weight: 600; text-decoration: underline;") "#{n.Post ? n.Post.titulo : 'tu foto'}"
+                else if n.tipo_evento === 'valoracion'
+                  | calificó tu publicación 
+                  a(href=`/posts/${n.id_publicacion}` style="font-weight: 600; text-decoration: underline;") "#{n.Post ? n.Post.titulo : 'tu foto'}"
+                else if n.tipo_evento === 'interes'
+                  | marcó 
+                  strong(style="color: var(--success);") "Me Interesa"
+                  |  en tu fotografía 
+                  a(href=`/posts/${n.id_publicacion}` style="font-weight: 600; text-decoration: underline;") "#{n.Post ? n.Post.titulo : 'tu foto'}"
+                else if n.tipo_evento === 'seguimiento'
+                  | comenzó a seguirte
+              
+              span.notification-date #{new Date(n.fecha).toLocaleString('es-ES')}
+
+            .notification-actions
+              if !n.leida
+                button.btn-success(
+                  onclick=`marcarComoLeida(${n.id})`
+                  style="font-size: 0.75rem; padding: 0.25rem 0.5rem; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34D399;"
+                )
+                  i.fa-solid.fa-check
+                  |  Leída
+    else
+      div(style="text-align: center; padding: 3rem 0; color: var(--text-muted);")
+        i.fa-solid.fa-bell-slash(style="font-size: 2.5rem; margin-bottom: 1rem; display: block;")
+        p No tienes ninguna notificación todavía.
+
+  script.
+    function marcarComoLeida(id) {
+      fetch(`/api/notifications/${id}/read`, { method: 'POST' })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          const item = document.getElementById(`notif-${id}`);
+          if (item) {
+            item.classList.remove('unread');
+            const btn = item.querySelector('.notification-actions button');
+            if (btn) btn.remove();
+          }
+        }
+      });
+    }
+
+    function marcarTodasComoLeidas() {
+      fetch('/api/notifications/read-all', { method: 'POST' })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          window.location.reload();
+        }
+      });
+    }

@@ -1,0 +1,27 @@
+extends layout
+
+block content
+  h2(style="font-size: 1.75rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;")
+    i.fa-solid.fa-paper-plane(style="color: var(--accent-primary); margin-right: 0.5rem;")
+    |  Bandeja de Entrada
+
+  if conversaciones && conversaciones.length > 0
+    .chat-container(style="grid-template-columns: 1fr; height: auto; min-height: 400px;")
+      .chat-list
+        each c in conversaciones
+          a.chat-list-item(href=`/messages/${c.otroUsuario.id}/${c.post.id}` style="display: flex; align-items: center; justify-content: space-between;")
+            div(style="display: flex; align-items: center; gap: 1rem; flex-grow: 1; overflow: hidden;")
+              img.chat-post-thumb(src=c.post.imagen alt=c.post.titulo)
+              .chat-list-details
+                span.chat-list-user @#{c.otroUsuario.username}
+                span(style="font-size: 0.8rem; color: #818CF8; font-weight: 500;") Foto: #{c.post.titulo}
+                span.chat-list-preview= c.ultimoMensaje
+            
+            div(style="text-align: right; flex-shrink: 0;")
+              span(style="font-size: 0.75rem; color: var(--text-muted);") #{new Date(c.fecha).toLocaleDateString('es-ES')}
+              i.fa-solid.fa-chevron-right(style="color: var(--text-muted); margin-left: 1rem; font-size: 0.8rem;")
+  else
+    div(style="text-align: center; padding: 5rem 2rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg);")
+      i.fa-solid.fa-comments(style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1.5rem; display: block;")
+      h2 No hay conversaciones activas
+      p.text-secondary(style="margin-top: 0.5rem;") Las conversaciones se inician cuando compras o haces click en "Me interesa" en la publicación de otro usuario.

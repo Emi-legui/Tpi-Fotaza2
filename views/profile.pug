@@ -1,0 +1,96 @@
+extends layout
+
+block content
+  //- Card de información del Perfil
+  .profile-header-card
+    .profile-info-block
+      h1.profile-username
+        i.fa-solid.fa-circle-user(style="margin-right: 0.5rem; color: var(--accent-primary);")
+        | @#{perfil.username}
+      p(style="color: var(--text-secondary); font-size: 0.9rem;") Miembro desde: #{new Date(perfil.createdAt).toLocaleDateString('es-ES')}
+      
+      .profile-stats
+        .stat-item
+          span#followers-count.stat-value= seguidoresCant
+          span.stat-label Seguidores
+        .stat-item
+          span.stat-value= seguidosCant
+          span.stat-label Seguidos
+        .stat-item
+          span.stat-value= posts ? posts.length : 0
+          span.stat-label Publicaciones
+          
+    //- Botón Seguir / Dejar de seguir (Sólo si está logueado y no es su propio perfil)
+    if usuario && usuario.id !== perfil.id
+      .profile-actions-block
+        button#btn-follow.btn-primary(
+          onclick=`toggleSeguimiento(${perfil.id})` 
+          style=loSigo ? 'background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #F87171; box-shadow: none;' : ''
+        )
+          if loSigo
+            i.fa-solid.fa-user-minus
+            |  Dejar de Seguir
+          else
+            i.fa-solid.fa-user-plus
+            |  Seguir Usuario
+
+  //- Listado de publicaciones del perfil
+  h2(style="font-size: 1.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;") Publicaciones de @#{perfil.username}
+  
+  if posts && posts.length > 0
+    .gallery-grid
+      each post in posts
+        article.post-card
+          a.post-image-container(href=`/posts/${post.id}`)
+            img.post-image(src=post.imagen alt=post.titulo loading="lazy")
+            span.license-tag(class=post.licencia)
+              if post.licencia === 'copyright'
+                i.fa-solid.fa-copyright
+                |  Copyright
+              else
+                i.fa-solid.fa-lock-open
+                |  Libre
+          
+          .post-content
+            a.post-card-title(href=`/posts/${post.id}` title=post.titulo)= post.titulo
+            div(style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-secondary);")
+              span Creado el #{new Date(post.fecha_creacion).toLocaleDateString('es-ES')}
+  else
+    div(style="text-align: center; padding: 4rem 2rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); margin-top: 2rem;")
+      i.fa-solid.fa-image(style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1.5rem; display: block;")
+      h2 No hay publicaciones
+      p.text-secondary(style="margin-top: 0.5rem;") Este usuario aún no ha compartido ninguna fotografía.
+
+  script.
+    function toggleSeguimiento(id) {
+      const btn = document.getElementById('btn-follow');
+      const countSpan = document.getElementById('followers-count');
+      
+      const loSigoActualmente = btn.innerText.includes('Dejar');
+      const url = loSigoActualmente ? '/api/users/unfollow/' + id : '/api/users/follow/' + id;
+
+      fetch(url, { method: 'POST' })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          // Cambiar estado visual del botón
+          if (loSigoActualmente) {
+            btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Seguir Usuario';
+            btn.style.background = 'var(--accent-gradient)';
+            btn.style.color = '#FFF';
+            btn.style.border = 'none';
+            btn.style.boxShadow = 'var(--shadow-sm)';
+            countSpan.innerText = parseInt(countSpan.innerText) - 1;
+          } else {
+            btn.innerHTML = '<i class="fa-solid fa-user-minus"></i> Dejar de Seguir';
+            btn.style.background = 'rgba(239, 68, 68, 0.15)';
+            btn.style.color = '#F87171';
+            btn.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+            btn.style.boxShadow = 'none';
+            countSpan.innerText = parseInt(countSpan.innerText) + 1;
+          }
+        }
+      });
+    }

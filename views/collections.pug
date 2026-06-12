@@ -1,0 +1,93 @@
+extends layout
+
+block content
+  .feed-header
+    .feed-title-container
+      h1 📁 Mis Colecciones
+      p Organiza tus fotos favoritas y crea álbumes de inspiración personalizados
+
+  //- Módulo para crear colección nueva
+  .search-filter-container(style="margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;")
+    h3(style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;") Crear Nueva Colección
+    form(action="/api/collections" method="POST" onsubmit="crearColeccion(event, this)" style="display: flex; gap: 1rem;")
+      input.form-input(type="text" name="nombre" placeholder="ej: Paisajes Soñados, Blanco y Negro" required style="flex-grow: 1;")
+      button.btn-primary(type="submit") Crear
+
+  //- Listado de colecciones
+  if colecciones && colecciones.length > 0
+    each col in colecciones
+      div(style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 2rem; box-shadow: var(--shadow-md);")
+        h2(style="font-size: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;")
+          span
+            i.fa-solid.fa-folder-open(style="color: var(--accent-primary); margin-right: 0.5rem;")
+            | #{col.nombre}
+          span(style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 400;") #{col.Posts ? col.Posts.length : 0} fotos
+        
+        if col.Posts && col.Posts.length > 0
+          .gallery-grid
+            each post in col.Posts
+              article.post-card(id=`col-post-${col.id}-${post.id}`)
+                a.post-image-container(href=`/posts/${post.id}`)
+                  img.post-image(src=post.imagen alt=post.titulo loading="lazy")
+                .post-content
+                  a.post-card-title(href=`/posts/${post.id}` title=post.titulo)= post.titulo
+                  div(style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;")
+                    a(href=`/profile/${post.id_autor}` style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 500;") @#{post.id_autor}
+                    button.action-link.danger-action(
+                      onclick=`quitarDeColeccion(${col.id}, ${post.id})`
+                      style="background: none; border: none; cursor: pointer; font-size: 0.75rem;"
+                    )
+                      i.fa-solid.fa-trash-can
+                      |  Quitar
+        else
+          p(style="color: var(--text-muted); text-align: center; font-size: 0.9rem; padding: 2rem 0;") Esta colección está vacía.
+  else
+    div(style="text-align: center; padding: 4rem 2rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); margin-top: 2rem;")
+      i.fa-solid.fa-folder-closed(style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1.5rem; display: block;")
+      h2 No tienes colecciones
+      p.text-secondary(style="margin-top: 0.5rem;") Comienza guardando fotos en "Favoritos" desde la vista de detalle de cualquier imagen.
+
+  script.
+    // Crear colección por AJAX
+    function crearColeccion(e, form) {
+      e.preventDefault();
+      const nombre = form.querySelector('[name="nombre"]').value;
+      
+      fetch('/api/collections', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          alert("Colección creada correctamente");
+          window.location.reload();
+        }
+      });
+    }
+
+    // Quitar foto de colección por AJAX
+    function quitarDeColeccion(id_coleccion, id_post) {
+      if (confirm("¿Estás seguro de que deseas quitar esta fotografía de la colección?")) {
+        fetch('/api/collections/remove', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id_coleccion, id_post })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            alert(data.error);
+          } else {
+            const card = document.getElementById(`col-post-${id_coleccion}-${id_post}`);
+            if (card) {
+              card.remove();
+            }
+            window.location.reload(); // Recargar para actualizar los contadores
+          }
+        });
+      }
+    }
