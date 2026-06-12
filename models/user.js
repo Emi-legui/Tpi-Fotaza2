@@ -32,6 +32,10 @@ const User = sequelize.define('User',{
         type: DataTypes.BOOLEAN,
         defaultValue: true 
     },  
+    publicaciones_bajadas: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
 });
 User.beforeCreate(async (user) => {
     const salt = await bcrypt.genSalt(10);

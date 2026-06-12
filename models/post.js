@@ -2,7 +2,7 @@ import {DataTypes} from 'sequelize';
 import sequelize from '../config/database.js';
 import User from './user.js';
 
-// Definición del modelo Post (publicación)
+// Definicion del modelo Post (publicacion)
 // (la estructura de la tabla en la base de datos)
 const Post = sequelize.define('Post', {
     id: {
@@ -16,7 +16,20 @@ const Post = sequelize.define('Post', {
     },
     descripcion: {
         type: DataTypes.TEXT,
+        allowNull: true
+    },
+    imagen: {
+        type: DataTypes.STRING,
         allowNull: false
+    },
+    licencia: {
+        type: DataTypes.ENUM('copyright', 'libre'),
+        defaultValue: 'libre',
+        allowNull: false
+    },
+    marca_agua_texto: {
+        type: DataTypes.STRING,
+        allowNull: true
     },
     comentarios_abiertos:{
         type: DataTypes.BOOLEAN,
