@@ -1,104 +1,204 @@
 import express from 'express';
-import Post from '../models/Post.js';
+import { Op } from 'sequelize';
+import Post from '../models/post.js';
+import Tag from '../models/tag.js';
+import User from '../models/user.js';
+import Valoracion from '../models/valoracion.js';
+import Comment from '../models/comment.js';
 import { verificarEstadoPublicacion } from '../controllers/postController.js';
+import { requiereAutenticacion } from '../middleware/authMiddleware.js';
+import upload from '../utils/upload.js';
+import { aplicarMarcaDeAgua } from '../utils/watermark.js';
 
-//Creamos un router 
-// para agrupar todas las rutas relacionadas con los posts(publicaciones)
-const router = express.Router(); 
+const router = express.Router();
 
-router.post('/create', async (req, res) => {
-    try{
-        //se obtienen los datos que envia el usuario
-        const{titulo, descripcion, id_autor} = req.body;
+// 1. Crear una publicacion (Formulario Multipart)
+router.post('/create', requiereAutenticacion, upload.single('imagen'), async (req, res) => {
+    try {
+        const { titulo, descripcion, licencia, marca_agua_texto, etiquetas } = req.body;
+        const id_autor = req.usuario.id;
 
+        if (!req.file) {
+            return res.status(400).render('create-post', { error: 'Debes subir una imagen para publicar.' });
+        }
+
+        // Ruta de acceso estática
+        const imagenRuta = `/uploads/${req.file.filename}`;
+        const absoluteImagePath = req.file.path;
+
+        // Aplicar marca de agua si es Copyright y tiene texto
+        if (licencia === 'copyright' && marca_agua_texto) {
+            try {
+                await aplicarMarcaDeAgua(absoluteImagePath, marca_agua_texto);
+            } catch (err) {
+                console.error('Error al estampar marca de agua:', err);
+                // Si falla el procesamiento de imagen, borramos el archivo subido y lanzamos error
+                return res.status(500).render('create-post', { error: 'Error al procesar la imagen con marca de agua.' });
+            }
+        }
+
+        // Guardar publicación en base de datos
         const nuevoPost = await Post.create({
             titulo,
-            descripcion,
-            id_autor //se asigna el id del autor al post(publicacion)
+            descripcion: descripcion || '',
+            imagen: imagenRuta,
+            licencia: licencia || 'libre',
+            marca_agua_texto: licencia === 'copyright' ? marca_agua_texto : null,
+            id_autor
         });
-//si la publicacion se crea con exito se responde con un mensaje de exito y los datos de la nueva publicacion
-    res.status(201).json({
-        message: 'Publicacion creada con exito',
-        post: nuevoPost
-    })
-    }catch(error){
-//si ocurre un error al crear la publicacion se responde con un mensaje de error y el detalle del error
-        res.status(500).json({
-            error: 'Error al crear la publicacion',
-            message: error.message   
-        });
+
+        // Guardar y asociar etiquetas
+        if (etiquetas) {
+            const tagsArray = etiquetas
+                .split(',')
+                .map(t => t.trim().toLowerCase())
+                .filter(t => t.length > 0);
+
+            for (const tagNombre of tagsArray) {
+                const [tagObj] = await Tag.findOrCreate({
+                    where: { nombre: tagNombre }
+                });
+                await nuevoPost.addTag(tagObj);
+            }
+        }
+
+        res.redirect('/posts');
+
+    } catch (error) {
+        console.error('Error al crear publicacion:', error);
+        res.status(500).render('create-post', { error: 'Error interno del servidor', message: error.message });
     }
 });
 
-//Listar todas las publicaciones
-router.get('/', async (req, res) => {
-    try{
-        //le pedios a la bd que busque rodos los registros de publicaciones
-        const publicaciones = await Post.findAll();
+// 2. Obtener lista de publicaciones (JSON - con filtros de busqueda)
+router.get('/buscar', async (req, res) => {
+    try {
+        const { q, tag, licencia, rating } = req.query;
+        let whereClause = {};
+
+        // Filtro por busqueda general (titulo o descripcion)
+        if (q) {
+            whereClause[Op.or] = [
+                { titulo: { [Op.iLike]: `%${q}%` } },
+                { descripcion: { [Op.iLike]: `%${q}%` } }
+            ];
+        }
+
+        // Filtro por tipo de licencia
+        if (licencia && (licencia === 'copyright' || licencia === 'libre')) {
+            whereClause.licencia = licencia;
+        }
+
+        // Estructura de inclusión para relacionar modelos
+        let includeClause = [
+            {
+                model: User,
+                attributes: ['id', 'username']
+            },
+            {
+                model: Tag,
+                attributes: ['id', 'nombre'],
+                through: { attributes: [] } // Oculta tabla pivote
+            },
+            {
+                model: Valoracion,
+                attributes: ['calificacion']
+            }
+        ];
+
+        // Filtro por etiqueta
+        if (tag) {
+            includeClause[1].where = { nombre: tag.trim().toLowerCase() };
+        }
+
+        // Buscar publicaciones con relaciones
+        let publicaciones = await Post.findAll({
+            where: whereClause,
+            include: includeClause,
+            order: [['fecha_creacion', 'DESC']]
+        });
+
+        // Calcular promedio de valoraciones y filtrar por rating si corresponde
+        publicaciones = publicaciones.map(post => {
+            const postJson = post.toJSON();
+            const valoraciones = postJson.Valoracions || [];
+            const cant = valoraciones.length;
+            const prom = cant > 0 ? (valoraciones.reduce((acc, v) => acc + v.calificacion, 0) / cant).toFixed(1) : 0;
+            
+            postJson.promedioValoracion = parseFloat(prom);
+            postJson.cantidadValoraciones = cant;
+            return postJson;
+        });
+
+        if (rating) {
+            const minRating = parseFloat(rating);
+            publicaciones = publicaciones.filter(post => post.promedioValoracion >= minRating);
+        }
+
         res.json(publicaciones);
 
-    }catch(error){
-        //si la consuta falla se responde con un mensaje de error y el detalle del error
-        res.status(500).json({
-            error: 'Error al obtener las publicaciones',
-            message: error.message
-        });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al filtrar las publicaciones', message: error.message });
     }
 });
-    //Editar una publicacion
-    router.put('/:id', async (req, res) => {
-        try{
-            const {id} = req.params;
-            const {titulo, descripcion} = req.body;
 
-            // 1. Verificamos si el post tiene 3 o mas denuncias pendientes
+// 3. Editar una publicacion
+router.put('/:id', requiereAutenticacion, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { titulo, descripcion } = req.body;
+
+        const post = await Post.findByPk(id);
+        if (!post) {
+            return res.status(404).json({ error: 'Publicación no encontrada' });
+        }
+
+        // Verificar autoría
+        if (post.id_autor !== req.usuario.id) {
+            return res.status(403).json({ error: 'No tienes permisos para editar esta publicacion' });
+        }
+
+        // Verificar estado de bloqueo por denuncias
         const estaBloqueado = await verificarEstadoPublicacion(id);
-        
-        // 2. Si esta bloqueado, impedimos la edicion y respondemos con error
         if (estaBloqueado) {
             return res.status(403).json({ 
                 error: 'No se puede editar', 
-                message: 'La publicacion tiene demasiadas denuncias y esta bloqueada para revision' 
+                message: 'La publicacion tiene denuncias acumuladas y esto bloqueada para revision' 
             });
         }
 
-            //buscamos la publicacion y lo actualizamon
-            const postActualizado = await Post.update(
-                {titulo, descripcion},
-                {where: {id : id}}
-            );
-            if(postActualizado[0] === 0){
-                return res.status(404).json({error: 'Publicacion no encontrada'});
-            }
-            res.json({message: 'Publicacion actualizada con exito'});
+        post.titulo = titulo;
+        post.descripcion = descripcion;
+        await post.save();
 
-        }catch(error){
-            res.status(500).json({
-                error: 'Error al actualizar la publicacion',
-                message: error.message
-            });
-        }
-    });
-    //Eliminar una publicacion
-    router.delete('/:id', async (req, res) => {
+        res.json({ message: 'Publicacion actualizada con exito', post });
+
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar la publicacion', message: error.message });
+    }
+});
+
+// 4. Eliminar una publicacion
+router.delete('/:id', requiereAutenticacion, async (req, res) => {
     try {
         const { id } = req.params;
 
-        const postEliminado = await Post.destroy({
-            where: { id: id }
-        });
-
-        if (postEliminado === 0) {
-            return res.status(404).json({ error: "Publicacion no encontrada" });
+        const post = await Post.findByPk(id);
+        if (!post) {
+            return res.status(404).json({ error: 'Publicacion no encontrada' });
         }
 
-        res.json({ message: "Publicacion eliminada con exito" });
-        
+        // Verificar autoria o si es moderador (validador)
+        if (post.id_autor !== req.usuario.id && !req.usuario.es_validador) {
+            return res.status(403).json({ error: 'No tienes permisos para eliminar esta publicacion' });
+        }
+
+        await post.destroy();
+        res.json({ message: 'Publicacion eliminada con exito' });
+
     } catch (error) {
-        res.status(500).json({ 
-            error: "Error al borrar la publicacion", 
-            message: error.message 
-        });
+        res.status(500).json({ error: 'Error al borrar la publicacion', message: error.message });
     }
 });
-     export default router;
+
+export default router;
