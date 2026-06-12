@@ -1,25 +1,30 @@
 import express from 'express';
 import Denuncia from '../models/denuncia.js';
 import { obtenerDenunciasPendientes, resolverDenuncia } from '../controllers/postController.js';
-import { esValidador, verificarToken } from '../middleware/authMiddleware.js';
+import { requiereAutenticacion, esValidador } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Ruta para crear una nueva denuncia
-router.post('/', async (req, res) => {
+// Ruta para crear una nueva denuncia (Requiere estar logueado)
+router.post('/', requiereAutenticacion, async (req, res) => {
     try {
-        // Extraemos los datos necesarios del cuerpo de la solicitud (body)
-        const { id_publicacion, id_usuario_denunciante, motivo } = req.body;
+        const { id_publicacion, id_comentario, motivo, descripcion } = req.body;
+        const id_usuario_denunciante = req.usuario.id;
 
-        // Creamos la denuncia en la base de datos
+        if (!id_publicacion && !id_comentario) {
+            return res.status(400).json({ error: 'Debes especificar una publicación o comentario para denunciar' });
+        }
+
         const nuevaDenuncia = await Denuncia.create({
-            id_publicacion,
+            id_publicacion: id_publicacion || null,
+            id_comentario: id_comentario || null,
             id_usuario_denunciante,
-            motivo
+            motivo,
+            descripcion
         });
 
         res.status(201).json({
-            message: 'Denuncia enviada correctamente. Sera revisada por nuestro equipo.',
+            message: 'Denuncia enviada correctamente. Será revisada por nuestro equipo de validadores.',
             denuncia: nuevaDenuncia
         });
 
@@ -30,10 +35,11 @@ router.post('/', async (req, res) => {
         });
     }
 });
-//Ruta para obtener denuncias pendientes
-router.get('/pendientes', verificarToken, esValidador , obtenerDenunciasPendientes);
 
-// Ruta para resolver una denuncia
-router.put('/resolver/:id', verificarToken, esValidador, resolverDenuncia);
+// Ruta para obtener denuncias pendientes (Solo validador)
+router.get('/pendientes', requiereAutenticacion, esValidador, obtenerDenunciasPendientes);
+
+// Ruta para resolver una denuncia (Solo validador)
+router.put('/resolver/:id', requiereAutenticacion, esValidador, resolverDenuncia);
 
 export default router;
