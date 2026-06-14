@@ -173,7 +173,7 @@ router.get('/posts/:id', opcionalAutenticacion, async (req, res) => {
         });
 
         if (!post || !post.User.esta_activo) {
-            return res.status(404).render('error', { message: 'La publicación no existe o el autor ha sido desactivado' });
+            return res.status(404).render('error', { message: 'La publicacion no existe o el autor ha sido desactivado' });
         }
 
         const postJson = post.toJSON();
@@ -217,7 +217,7 @@ router.get('/posts/:id', opcionalAutenticacion, async (req, res) => {
 
     } catch (error) {
         console.error('Error al obtener detalle:', error);
-        res.status(500).render('error', { message: 'Error interno al cargar la publicación' });
+        res.status(500).render('error', { message: 'Error interno al cargar la publicacion' });
     }
 });
 
@@ -233,7 +233,7 @@ router.get('/profile/:id', opcionalAutenticacion, async (req, res) => {
 
         if (!user.esta_activo) {
             return res.status(403).render('error', { 
-                message: 'Esta cuenta ha sido desactivada por acumulación de publicaciones dadas de baja.' 
+                message: 'Esta cuenta ha sido desactivada por acumulacion de publicaciones dadas de baja.' 
             });
         }
 
@@ -368,7 +368,7 @@ router.get('/messages/:otroUserId/:postId', requiereAutenticacion, async (req, r
         const post = await Post.findByPk(postId, { attributes: ['id', 'titulo', 'imagen'] });
 
         if (!otroUsuario || !post) {
-            return res.status(404).render('error', { message: 'Chat no disponible. El usuario o publicación no existen.' });
+            return res.status(404).render('error', { message: 'Chat no disponible. El usuario o publicacion no existen.' });
         }
 
         // Obtener historial de mensajes
@@ -389,7 +389,7 @@ router.get('/messages/:otroUserId/:postId', requiereAutenticacion, async (req, r
             mensajes
         });
     } catch (error) {
-        res.status(500).render('error', { message: 'Error al abrir la conversación' });
+        res.status(500).render('error', { message: 'Error al abrir la conversacion' });
     }
 });
 

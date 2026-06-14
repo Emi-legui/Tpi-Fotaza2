@@ -20,7 +20,7 @@ router.post('/', requiereAutenticacion, async (req, res) => {
         }
 
         if (!post.comentarios_abiertos) {
-            return res.status(403).json({ error: 'Los comentarios para esta publicación están cerrados' });
+            return res.status(403).json({ error: 'Los comentarios para esta publicacion estan cerrados' });
         }
 
         const nuevoComentario = await Comment.create({
@@ -41,7 +41,7 @@ router.post('/', requiereAutenticacion, async (req, res) => {
 
         // Si es AJAX devolvemos JSON, de lo contrario redirigimos al detalle de la foto
         if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-            res.status(201).json({ message: 'Comentario creado con éxito', comment: nuevoComentario });
+            res.status(201).json({ message: 'Comentario creado con exito', comment: nuevoComentario });
         } else {
             res.redirect(`/posts/${id_post}`);
         }
@@ -58,11 +58,11 @@ router.post('/close/:id_post', requiereAutenticacion, async (req, res) => {
         const post = await Post.findByPk(id_post);
 
         if (!post) {
-            return res.status(404).json({ error: 'Publicación no encontrada' });
+            return res.status(404).json({ error: 'Publicacion no encontrada' });
         }
 
         if (post.id_autor !== req.usuario.id) {
-            return res.status(403).json({ error: 'Solo el autor de la publicación puede cerrar los comentarios' });
+            return res.status(403).json({ error: 'Solo el autor de la publicacion puede cerrar los comentarios' });
         }
 
         post.comentarios_abiertos = false;
@@ -134,7 +134,7 @@ router.delete('/:id', requiereAutenticacion, async (req, res) => {
         }
 
         await comentario.destroy();
-        res.json({ message: 'Comentario eliminado con éxito' });
+        res.json({ message: 'Comentario eliminado con exito' });
 
     } catch (error) {
         res.status(500).json({ error: 'Error al borrar el comentario', message: error.message });
