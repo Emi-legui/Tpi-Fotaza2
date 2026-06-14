@@ -1,6 +1,6 @@
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const multer = require('multer');
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import multer from 'multer';
 
 // Configuracion de Cloudinary 
 cloudinary.config({
@@ -13,11 +13,11 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'fotaza_uploads', // Nombre de la carpeta que se creara 
+    folder: 'fotaza_uploads', // Nombre de la carpeta que se creara solo en tu cuenta
     allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
   },
 });
 
 const upload = multer({ storage: storage });
 
-module.exports = upload;
+export default upload;
