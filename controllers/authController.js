@@ -12,8 +12,8 @@ export async function register(req, res) {
 
         await User.create({username, email, password   });
 
-        //tras un registro exitoso, lo mandamos directo al login para que entre
-        res.redirect('/api/auth/login');
+        //tras un registro exitoso, lo mandamos al login limpio
+        res.redirect('/login');
 
     } catch (error) {
         res.status(400).render('register', { error: 'Error al registrar el usuario', message: error.message });
@@ -37,9 +37,9 @@ export async function login(req, res) {
             return res.status(401).render('login', { error: 'Credenciales invalidas' });
         }
 
-        // 3. Si todo es correcto, generamos un Token
+        // 3. Si todo es correcto, generamos un Token con id, username y rol validador
         const token = jwt.sign(
-            { id: user.id, es_validador: user.es_validador }, 
+            { id: user.id, username: user.username, es_validador: user.es_validador }, 
             SECRET_KEY, 
             { expiresIn: '1h' } // El token expira en 1 hora
         );
