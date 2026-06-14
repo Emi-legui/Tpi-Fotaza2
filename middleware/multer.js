@@ -13,7 +13,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'fotaza_uploads', // Nombre de la carpeta que se creara solo en tu cuenta
+    folder: 'fotaza_uploads', // Nombre de la carpeta que se creara 
     allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
   },
 });
