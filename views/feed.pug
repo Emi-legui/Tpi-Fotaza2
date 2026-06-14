@@ -3,14 +3,14 @@ extends layout
 block content
   .feed-header
     .feed-title-container
-      h1 🌌 Explorar Galería
-      p Encuentra, comparte y valora fotografías artísticas de alta calidad
+      h1 Explorar Galeria
+      p Encuentra, comparte y valora fotografias artisticas de alta calidad
 
-    //- Panel de búsqueda y filtrado
+    //- Panel de busqueda y filtrado
     .search-filter-container
       form.search-form(action="/posts" method="GET")
         .search-input-wrapper
-          input.search-input(type="text" name="q" placeholder="Buscar por título o descripción..." value=query.q || '')
+          input.search-input(type="text" name="q" placeholder="Buscar por titulo o descripcion..." value=query.q || '')
         button.btn-primary(type="submit")
           i.fa-solid.fa-magnifying-glass
           |  Buscar
@@ -31,10 +31,10 @@ block content
               option(value="copyright" selected=query.licencia === 'copyright') Con Copyright
           
           select.filter-select(name="rating" onchange="this.form.submit()")
-            option(value="" selected=!query.rating) Calificación (Cualquiera)
-            option(value="4" selected=query.rating === '4') 4★ o más
-            option(value="3" selected=query.rating === '3') 3★ o más
-            option(value="2" selected=query.rating === '2') 2★ o más
+            option(value="" selected=!query.rating) Calificacion (Cualquiera)
+            option(value="4" selected=query.rating === '4') 4 estrellas o mas
+            option(value="3" selected=query.rating === '3') 3 estrellas o mas
+            option(value="2" selected=query.rating === '2') 2 estrellas o mas
 
           if usuario
             label.filter-select(style="display: flex; align-items: center; gap: 0.5rem; user-select: none; font-size: 0.9rem;")
@@ -70,7 +70,7 @@ block content
             a.post-card-title(href=`/posts/${post.id}` title=post.titulo)= post.titulo
             
             .post-author
-              a.post-author-name(href=`/profile/${post.id_autor}`) @#{post.User ? post.User.username : 'anónimo'}
+              a.post-author-name(href=`/profile/${post.id_autor}`) @#{post.User ? post.User.username : 'anonimo'}
               if post.cantidadValoraciones > 0
                 span.post-rating-badge(title=`${post.cantidadValoraciones} valoraciones`)
                   i.fa-solid.fa-star
@@ -85,5 +85,5 @@ block content
   else
     div(style="text-align: center; padding: 4rem 2rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); margin-top: 2rem;")
       i.fa-solid.fa-cloud-moon(style="font-size: 3.5rem; color: var(--text-muted); margin-bottom: 1.5rem; display: block;")
-      h2 No se encontraron imágenes
-      p.text-secondary(style="margin-top: 0.5rem;") Prueba a cambiar los filtros de búsqueda o restablecer la galería.
+      h2 No se encontraron imagenes
+      p.text-secondary(style="margin-top: 0.5rem;") Prueba a cambiar los filtros de busqueda o restablecer la galeria.

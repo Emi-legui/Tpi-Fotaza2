@@ -10,10 +10,10 @@ block content
           |  Volver
         
         div(style="flex-grow: 1;")
-          h3(style="font-size: 1.1rem; font-weight: 600;") Conversación con @#{otroUsuario.username}
+          h3(style="font-size: 1.1rem; font-weight: 600;") Conversacion con @#{otroUsuario.username}
           a.chat-post-preview(href=`/posts/${post.id}`)
             img.chat-post-thumb(src=post.imagen alt=post.titulo style="width: 24px; height: 24px;")
-            span Negociación por: 
+            span Negociacion por: 
               strong(style="color: var(--text-primary); text-decoration: underline;") #{post.titulo}
               
       //- Listado de mensajes en tiempo real/historial
@@ -24,7 +24,7 @@ block content
               p= msg.contenido
               .message-time #{new Date(msg.fecha_envio).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
         else
-          p(style="text-align: center; color: var(--text-muted); font-size: 0.9rem;") No hay mensajes todavía. Comienza saludando al vendedor.
+          p(style="text-align: center; color: var(--text-muted); font-size: 0.9rem;") No hay mensajes todavia. Comienza saludando al vendedor.
 
       //- Barra de escritura
       form.chat-input-bar(action="/api/messages/send" method="POST" onsubmit="enviarMensajeChat(event, this)")

@@ -3,14 +3,14 @@ extends layout
 block content
   .feed-header
     .feed-title-container
-      h1 📁 Mis Colecciones
-      p Organiza tus fotos favoritas y crea álbumes de inspiración personalizados
+      h1 Mis Colecciones
+      p Organiza tus fotos favoritas y crea albumes de inspiracion personalizados
 
   //- Módulo para crear colección nueva
   .search-filter-container(style="margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;")
-    h3(style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;") Crear Nueva Colección
+    h3(style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;") Crear Nueva Coleccion
     form(action="/api/collections" method="POST" onsubmit="crearColeccion(event, this)" style="display: flex; gap: 1rem;")
-      input.form-input(type="text" name="nombre" placeholder="ej: Paisajes Soñados, Blanco y Negro" required style="flex-grow: 1;")
+      input.form-input(type="text" name="nombre" placeholder="ej: Paisajes Hermosos, Blanco y Negro" required style="flex-grow: 1;")
       button.btn-primary(type="submit") Crear
 
   //- Listado de colecciones
@@ -40,7 +40,7 @@ block content
                       i.fa-solid.fa-trash-can
                       |  Quitar
         else
-          p(style="color: var(--text-muted); text-align: center; font-size: 0.9rem; padding: 2rem 0;") Esta colección está vacía.
+          p(style="color: var(--text-muted); text-align: center; font-size: 0.9rem; padding: 2rem 0;") Esta coleccion esta vacia.
   else
     div(style="text-align: center; padding: 4rem 2rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); margin-top: 2rem;")
       i.fa-solid.fa-folder-closed(style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1.5rem; display: block;")
@@ -63,7 +63,7 @@ block content
         if (data.error) {
           alert(data.error);
         } else {
-          alert("Colección creada correctamente");
+          alert("Coleccion creada correctamente");
           window.location.reload();
         }
       });
@@ -71,7 +71,7 @@ block content
 
     // Quitar foto de colección por AJAX
     function quitarDeColeccion(id_coleccion, id_post) {
-      if (confirm("¿Estás seguro de que deseas quitar esta fotografía de la colección?")) {
+      if (confirm("Estas seguro de que deseas quitar esta fotografia de la coleccion?")) {
         fetch('/api/collections/remove', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

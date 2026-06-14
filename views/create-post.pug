@@ -2,7 +2,7 @@ extends layout
 
 block content
   .form-container(style="max-width: 650px;")
-    h2.form-title 📸 Compartir Nueva Fotografía
+    h2.form-title Compartir Nueva Fotografia
     p.form-subtitle Sube tus creaciones, asocia etiquetas y define tu tipo de licencia
     
     if error
@@ -14,17 +14,17 @@ block content
 
     form(action="/api/posts/create" method="POST" enctype="multipart/form-data")
       .form-group
-        label.form-label(for="titulo") Título de la Publicación
+        label.form-label(for="titulo") Titulo de la Publicacion
         input#titulo.form-input(type="text" name="titulo" placeholder="ej: Atardecer dorado en el campo" required)
       
       .form-group
-        label.form-label(for="descripcion") Descripción (Opcional)
-        textarea#descripcion.form-input(name="descripcion" placeholder="Describe brevemente los detalles, la cámara, el lugar, etc..." style="height: 100px; resize: vertical;")
+        label.form-label(for="descripcion") Descripcion (Opcional)
+        textarea#descripcion.form-input(name="descripcion" placeholder="Describe brevemente los detalles, la camara, el lugar, etc..." style="height: 100px; resize: vertical;")
       
       .form-group
         label.form-label(for="imagen") Seleccionar Imagen
         input#imagen.form-input(type="file" name="imagen" accept="image/*" required style="padding: 0.5rem;")
-        p.form-help Formatos aceptados: JPG, JPEG, PNG, WEBP, GIF. Máx 10MB.
+        p.form-help Formatos aceptados: JPG, JPEG, PNG, WEBP, GIF. Max 10MB.
         
       .form-group
         label.form-label(for="etiquetas") Etiquetas (Tags)
@@ -34,18 +34,18 @@ block content
       .form-group
         label.form-label(for="licencia") Tipo de Licencia
         select#licencia.filter-select(name="licencia" required onchange="toggleWatermarkField(this.value)")
-          option(value="libre" selected) Libre de Copyright (Uso público libre)
+          option(value="libre" selected) Libre de Copyright (Uso publico libre)
           option(value="copyright") Con Copyright (Protegida)
           
-      //- Campo marca de agua (Se muestra sólo si es Copyright)
+      //- Campo marca de agua (Se muestra solo si es Copyright)
       #watermark-field.form-group(style="display: none; background: rgba(99, 102, 241, 0.03); border: 1px dashed var(--border-hover); padding: 1.25rem; border-radius: var(--radius-sm); margin-top: 0.5rem;")
         label.form-label(for="marca_agua_texto" style="color: #818CF8;") Texto de la Marca de Agua
-        input#marca_agua_texto.form-input(type="text" name="marca_agua_texto" placeholder="ej: © Nombre Autor")
-        p.form-help(style="color: var(--text-secondary);") Este texto se estampará de forma permanente sobre tu imagen subida en la esquina inferior derecha para protegerla de copias no autorizadas.
+        input#marca_agua_texto.form-input(type="text" name="marca_agua_texto" placeholder="ej: (C) Nombre Autor")
+        p.form-help(style="color: var(--text-secondary);") Este texto se estampara de forma permanente sobre tu imagen subida en la esquina inferior derecha para protegerla de copias no autorizadas.
 
       button.btn-primary(type="submit" style="width: 100%; margin-top: 1.5rem; padding: 0.9rem;") 
         i.fa-solid.fa-cloud-arrow-up
-        |  Publicar Fotografía
+        |  Publicar Fotografia
 
   script.
     function toggleWatermarkField(val) {

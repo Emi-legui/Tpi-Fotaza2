@@ -3,8 +3,8 @@ extends layout
 block content
   .feed-header
     .feed-title-container
-      h1 👥 Comunidad de Fotaza 2
-      p Explora y conoce a otros fotógrafos y validadores de la comunidad
+      h1 Comunidad de Fotaza 2
+      p Explora y conoce a otros fotografos y validadores de la comunidad
 
   if users && users.length > 0
     .gallery-grid
@@ -21,7 +21,7 @@ block content
             else
               span.user-tag(style="font-size: 0.75rem; display: inline-block; margin-top: 0.25rem;") 
                 i.fa-solid.fa-camera
-                |  Fotógrafo
+                |  Fotografo
                 
           a.btn-secondary(href=`/profile/${user.id}` style="width: 100%; font-size: 0.85rem;") Ver Perfil
   else

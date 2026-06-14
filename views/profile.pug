@@ -1,7 +1,7 @@
 extends layout
 
 block content
-  //- Card de información del Perfil
+  //- Card de informacion del Perfil
   .profile-header-card
     .profile-info-block
       h1.profile-username
@@ -20,7 +20,7 @@ block content
           span.stat-value= posts ? posts.length : 0
           span.stat-label Publicaciones
           
-    //- Botón Seguir / Dejar de seguir (Sólo si está logueado y no es su propio perfil)
+    //- Boton Seguir / Dejar de seguir (Solo si esta logueado y no es su propio perfil)
     if usuario && usuario.id !== perfil.id
       .profile-actions-block
         button#btn-follow.btn-primary(
@@ -59,7 +59,7 @@ block content
     div(style="text-align: center; padding: 4rem 2rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); margin-top: 2rem;")
       i.fa-solid.fa-image(style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1.5rem; display: block;")
       h2 No hay publicaciones
-      p.text-secondary(style="margin-top: 0.5rem;") Este usuario aún no ha compartido ninguna fotografía.
+      p.text-secondary(style="margin-top: 0.5rem;") Este usuario aun no ha compartido ninguna fotografia.
 
   script.
     function toggleSeguimiento(id) {

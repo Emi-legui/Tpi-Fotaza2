@@ -3,8 +3,8 @@ extends layout
 block content
   .feed-header
     .feed-title-container
-      h1 🛡️ Panel de Validación de Contenidos
-      p Moderación y revisión de publicaciones y comentarios denunciados por la comunidad.
+      h1 Panel de Validacion de Contenidos
+      p Moderacion y revision de publicaciones y comentarios denunciados por la comunidad.
 
   if denuncias && denuncias.length > 0
     .validator-table-container
@@ -16,7 +16,7 @@ block content
             th Contenido Denunciado
             th Autor Contenido
             th Denunciante
-            th Motivo / Justificación
+            th Motivo / Justificacion
             th Acciones
         tbody
           each d in denuncias
@@ -47,7 +47,7 @@ block content
                   a(href=`/profile/${d.Comment.id_usuario}`) @#{d.Comment.User ? d.Comment.User.username : 'desconocido'}
                   
               td
-                a(href=`/profile/${d.id_usuario_denunciante}`) @#{d.User ? d.User.username : 'anónimo'}
+                a(href=`/profile/${d.id_usuario_denunciante}`) @#{d.User ? d.User.username : 'anonimo'}
                 
               td
                 strong(style="color: var(--warning); display: block; font-size: 0.85rem;")= d.motivo
@@ -70,8 +70,8 @@ block content
   script.
     function resolverDenuncia(id, accion) {
       const confirmMsg = accion === 'bajar' 
-        ? "¿Estás seguro de que deseas dar de baja este contenido? Esta acción lo borrará permanentemente de la plataforma y penalizará al autor." 
-        : "¿Deseas desestimar esta denuncia?";
+        ? "Estas seguro de que deseas dar de baja este contenido? Esta accion lo borrara permanentemente de la plataforma y penalizara al autor." 
+        : "Deseas desestimar esta denuncia?";
 
       if (confirm(confirmMsg)) {
         fetch(`/api/denuncias/resolver/${id}`, {
