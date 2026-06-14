@@ -32,7 +32,6 @@ router.post('/create', requiereAutenticacion, upload.single('imagen'), async (re
                 await aplicarMarcaDeAgua(absoluteImagePath, marca_agua_texto);
             } catch (err) {
                 console.error('Error al estampar marca de agua:', err);
-                // Si falla el procesamiento de imagen, borramos el archivo subido y lanzamos error
                 return res.status(500).render('create-post', { error: 'Error al procesar la imagen con marca de agua.' });
             }
         }
