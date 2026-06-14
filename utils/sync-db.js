@@ -1,6 +1,18 @@
 import sequelize from '../config/database.js';
+
+// Importar todos los modelos para que Sequelize los registre y los cree en orden de relacion
 import User from '../models/user.js';
+import Post from '../models/post.js';
+import Comment from '../models/comment.js';
+import Denuncia from '../models/denuncia.js';
 import Tag from '../models/tag.js';
+import PostTag from '../models/postTag.js';
+import Valoracion from '../models/valoracion.js';
+import Seguidor from '../models/seguidor.js';
+import Notificacion from '../models/notificacion.js';
+import Coleccion from '../models/coleccion.js';
+import ColeccionPost from '../models/coleccionPost.js';
+import Mensaje from '../models/mensaje.js';
 
 async function sincronizarBaseDeDatos() {
     try {

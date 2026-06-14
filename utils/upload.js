@@ -4,7 +4,7 @@ import path from 'path';
 // Configuración del almacenamiento para multer
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'public/uploads/');
+        cb(null, process.env.VERCEL ? '/tmp' : 'public/uploads/');
     },
     filename: (req, file, cb) => {
         // Nombre de archivo unico usando timestamp y numeros aleatorios

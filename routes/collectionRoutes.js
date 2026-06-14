@@ -27,7 +27,7 @@ router.post('/', requiereAutenticacion, async (req, res) => {
     try {
         const { nombre } = req.body;
         if (!nombre || nombre.trim().length === 0) {
-            return res.status(400).json({ error: 'El nombre de la colección es requerido' });
+            return res.status(400).json({ error: 'El nombre de la coleccion es requerido' });
         }
 
         // Buscar o crear la colección para evitar duplicados del mismo usuario
@@ -39,10 +39,10 @@ router.post('/', requiereAutenticacion, async (req, res) => {
         });
 
         if (!creada) {
-            return res.status(400).json({ error: 'Ya tienes una colección con ese nombre' });
+            return res.status(400).json({ error: 'Ya tienes una coleccion con ese nombre' });
         }
 
-        res.status(201).json({ message: 'Colección creada con éxito', coleccion });
+        res.status(201).json({ message: 'Coleccion creada con exito', coleccion });
     } catch (error) {
         res.status(500).json({ error: 'Error al crear colección', message: error.message });
     }
@@ -59,13 +59,13 @@ router.post('/add', requiereAutenticacion, async (req, res) => {
         });
 
         if (!coleccion) {
-            return res.status(404).json({ error: 'Colección no encontrada' });
+            return res.status(404).json({ error: 'Coleccion no encontrada' });
         }
 
         // Verificar existencia del post
         const post = await Post.findByPk(id_post);
         if (!post) {
-            return res.status(404).json({ error: 'Publicación no encontrada' });
+            return res.status(404).json({ error: 'Publicacion no encontrada' });
         }
 
         // Asociar (Sequelize previene duplicados si usamos findOrCreate o captura la restricción de base de datos)
@@ -77,10 +77,10 @@ router.post('/add', requiereAutenticacion, async (req, res) => {
         });
 
         if (!creada) {
-            return res.status(400).json({ error: 'La publicación ya se encuentra en esta colección' });
+            return res.status(400).json({ error: 'La publicacion ya se encuentra en esta coleccion' });
         }
 
-        res.json({ message: 'Publicación agregada a la colección correctamente' });
+        res.json({ message: 'Publicacion agregada a la coleccion correctamente' });
     } catch (error) {
         res.status(500).json({ error: 'Error al añadir a la colección', message: error.message });
     }
@@ -96,7 +96,7 @@ router.post('/remove', requiereAutenticacion, async (req, res) => {
         });
 
         if (!coleccion) {
-            return res.status(404).json({ error: 'Colección no encontrada' });
+            return res.status(404).json({ error: 'Coleccion no encontrada' });
         }
 
         await ColeccionPost.destroy({
@@ -106,7 +106,7 @@ router.post('/remove', requiereAutenticacion, async (req, res) => {
             }
         });
 
-        res.json({ message: 'Publicación eliminada de la colección correctamente' });
+        res.json({ message: 'Publicacion eliminada de la coleccion correctamente' });
     } catch (error) {
         res.status(500).json({ error: 'Error al remover de la colección', message: error.message });
     }
@@ -136,14 +136,14 @@ router.post('/toggle-favorite/:id_post', requiereAutenticacion, async (req, res)
         if (favExistente) {
             // Quitar de favoritos
             await favExistente.destroy();
-            return res.json({ message: 'Publicación quitada de favoritos', favorited: false });
+            return res.json({ message: 'Publicacion quitada de favoritos', favorited: false });
         } else {
             // Añadir a favoritos
             await ColeccionPost.create({
                 id_coleccion: favColec.id,
                 id_publicacion: id_post
             });
-            return res.json({ message: 'Publicación guardada en favoritos', favorited: true });
+            return res.json({ message: 'Publicacion guardada en favoritos', favorited: true });
         }
 
     } catch (error) {

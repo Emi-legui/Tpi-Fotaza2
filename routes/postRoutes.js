@@ -150,10 +150,10 @@ router.put('/:id', requiereAutenticacion, async (req, res) => {
 
         const post = await Post.findByPk(id);
         if (!post) {
-            return res.status(404).json({ error: 'Publicación no encontrada' });
+            return res.status(404).json({ error: 'Publicacion no encontrada' });
         }
 
-        // Verificar autoría
+        // Verificar autoria
         if (post.id_autor !== req.usuario.id) {
             return res.status(403).json({ error: 'No tienes permisos para editar esta publicacion' });
         }
@@ -163,7 +163,7 @@ router.put('/:id', requiereAutenticacion, async (req, res) => {
         if (estaBloqueado) {
             return res.status(403).json({ 
                 error: 'No se puede editar', 
-                message: 'La publicacion tiene denuncias acumuladas y esto bloqueada para revision' 
+                message: 'La publicacion tiene denuncias acumuladas y esta bloqueada para revision' 
             });
         }
 

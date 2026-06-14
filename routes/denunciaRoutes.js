@@ -12,7 +12,7 @@ router.post('/', requiereAutenticacion, async (req, res) => {
         const id_usuario_denunciante = req.usuario.id;
 
         if (!id_publicacion && !id_comentario) {
-            return res.status(400).json({ error: 'Debes especificar una publicación o comentario para denunciar' });
+            return res.status(400).json({ error: 'Debes especificar una publicacion o comentario para denunciar' });
         }
 
         const nuevaDenuncia = await Denuncia.create({
@@ -24,7 +24,7 @@ router.post('/', requiereAutenticacion, async (req, res) => {
         });
 
         res.status(201).json({
-            message: 'Denuncia enviada correctamente. Será revisada por nuestro equipo de validadores.',
+            message: 'Denuncia enviada correctamente. Sera revisada por nuestro equipo de validadores.',
             denuncia: nuevaDenuncia
         });
 

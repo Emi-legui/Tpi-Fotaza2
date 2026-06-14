@@ -17,11 +17,11 @@ router.post('/interest/:id_post', requiereAutenticacion, async (req, res) => {
         // Buscar el post y su autor
         const post = await Post.findByPk(id_post);
         if (!post) {
-            return res.status(404).json({ error: 'Publicación no encontrada' });
+            return res.status(404).json({ error: 'Publicacion no encontrada' });
         }
 
         if (post.id_autor === id_comprador) {
-            return res.status(400).json({ error: 'No puedes marcar "Me interesa" en tu propia publicación' });
+            return res.status(400).json({ error: 'No puedes marcar "Me interesa" en tu propia publicacion' });
         }
 
         // Crear la notificación para el autor
@@ -34,7 +34,7 @@ router.post('/interest/:id_post', requiereAutenticacion, async (req, res) => {
 
         // Crear un mensaje automático para iniciar la conversación
         const mensajeAuto = await Mensaje.create({
-            contenido: `Hola, estoy interesado en adquirir tu fotografía "${post.titulo}". ¿Podemos ponernos en contacto?`,
+            contenido: `Hola, estoy interesado en adquirir tu fotografia "${post.titulo}". Podemos ponernos en contacto?`,
             id_remitente: id_comprador,
             id_destinatario: post.id_autor,
             id_publicacion: id_post
@@ -42,7 +42,7 @@ router.post('/interest/:id_post', requiereAutenticacion, async (req, res) => {
 
         // Si es AJAX devolvemos JSON, si no redirigimos al chat
         if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-            res.json({ message: 'Interés registrado e inicio de chat creado', chatUrl: `/messages/${post.id_autor}/${id_post}` });
+            res.json({ message: 'Interes registrado e inicio de chat creado', chatUrl: `/messages/${post.id_autor}/${id_post}` });
         } else {
             res.redirect(`/messages/${post.id_autor}/${id_post}`);
         }
@@ -59,7 +59,7 @@ router.post('/send', requiereAutenticacion, async (req, res) => {
         const id_remitente = req.usuario.id;
 
         if (!contenido || contenido.trim().length === 0) {
-            return res.status(400).json({ error: 'El contenido del mensaje no puede estar vacío' });
+            return res.status(400).json({ error: 'El contenido del mensaje no puede estar vacio' });
         }
 
         const mensaje = await Mensaje.create({

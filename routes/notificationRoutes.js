@@ -39,15 +39,15 @@ router.post('/:id/read', requiereAutenticacion, async (req, res) => {
         });
 
         if (!notif) {
-            return res.status(404).json({ error: 'Notificación no encontrada' });
+            return res.status(404).json({ error: 'Notificacion no encontrada' });
         }
 
         notif.leida = true;
         await notif.save();
 
-        res.json({ message: 'Notificación marcada como leída', notificacion: notif });
+        res.json({ message: 'Notificacion marcada como leida', notificacion: notif });
     } catch (error) {
-        res.status(500).json({ error: 'Error al actualizar la notificación', message: error.message });
+        res.status(500).json({ error: 'Error al actualizar la notificacion', message: error.message });
     }
 });
 
@@ -58,7 +58,7 @@ router.post('/read-all', requiereAutenticacion, async (req, res) => {
             { leida: true },
             { where: { id_usuario_destino: req.usuario.id, leida: false } }
         );
-        res.json({ message: 'Todas las notificaciones han sido marcadas como leídas' });
+        res.json({ message: 'Todas las notificaciones han sido marcadas como leidas' });
     } catch (error) {
         res.status(500).json({ error: 'Error al actualizar notificaciones', message: error.message });
     }

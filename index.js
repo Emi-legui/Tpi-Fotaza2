@@ -1,5 +1,7 @@
 import cookieParser from 'cookie-parser';
 import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import sequelize from './config/database.js';
 
 // Importar todos los modelos para asegurar que se definan las relaciones en Sequelize
@@ -28,21 +30,29 @@ import notificationRoutes from './routes/notificationRoutes.js';
 import collectionRoutes from './routes/collectionRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 
-// Configuración de Pug como motor de plantillas
+// Configuracion de Pug como motor de plantillas
 app.set('view engine', 'pug');
-app.set('views', './views');
+app.set('views', path.join(__dirname, 'views'));
 
 // Middleware para parsear JSON, formularios y cookies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Carpeta pública para archivos estáticos (CSS, JS, imágenes subidas)
-app.use(express.static('public'));
+// Carpeta publica para archivos estaticos (CSS, JS, imagenes subidadas)
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Rutas de Páginas Principales (Frontend)
+// Servir la carpeta temporal /tmp si corre en Vercel
+if (process.env.VERCEL) {
+    app.use('/uploads', express.static('/tmp'));
+}
+
+// Rutas de Paginas Principales (Frontend)
 app.use('/', pageRoutes);
 
 // Rutas de API
@@ -56,7 +66,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/collections', collectionRoutes);
 app.use('/api/messages', messageRoutes);
 
-// Iniciamos la conexión con la base de datos
+// Iniciamos la conexion con la base de datos
 sequelize.sync()
     .then(() => {
         console.log('Base de datos sincronizada.');
@@ -69,3 +79,5 @@ sequelize.sync()
     .catch(error => {
         console.error('Error al conectar con la base de datos:', error);
     });
+
+export default app;

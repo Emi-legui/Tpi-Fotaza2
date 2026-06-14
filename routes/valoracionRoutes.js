@@ -14,12 +14,12 @@ router.post('/', requiereAutenticacion, async (req, res) => {
 
         const calif = parseInt(calificacion);
         if (isNaN(calif) || calif < 1 || calif > 5) {
-            return res.status(400).json({ error: 'La calificación debe ser un número entero entre 1 y 5' });
+            return res.status(400).json({ error: 'La calificacion debe ser un numero entero entre 1 y 5' });
         }
 
         const post = await Post.findByPk(id_publicacion);
         if (!post) {
-            return res.status(404).json({ error: 'Publicación no encontrada' });
+            return res.status(404).json({ error: 'Publicacion no encontrada' });
         }
 
         // El autor no puede valorar su propia publicación
@@ -50,13 +50,13 @@ router.post('/', requiereAutenticacion, async (req, res) => {
         });
 
         if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-            res.json({ message: 'Calificación guardada con éxito', valoracion });
+            res.json({ message: 'Calificacion guardada con exito', valoracion });
         } else {
             res.redirect(`/posts/${id_publicacion}`);
         }
 
     } catch (error) {
-        res.status(500).json({ error: 'Error al calificar la publicación', message: error.message });
+        res.status(500).json({ error: 'Error al calificar la publicacion', message: error.message });
     }
 });
 
