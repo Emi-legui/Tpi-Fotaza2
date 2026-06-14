@@ -31,7 +31,7 @@ export async function login(req, res) {
             return res.status(401).render('login', { error: 'Credenciales invalidas' });
         }
 
-        // 2. Comparamos la contraseña enviada con la guardada (ya cifrada)
+        // 2. Comparamos la contrasena enviada con la guardada (ya cifrada)
         const passwordValida = await bcrypt.compare(password, user.password);
         if (!passwordValida) {
             return res.status(401).render('login', { error: 'Credenciales invalidas' });
@@ -47,7 +47,7 @@ export async function login(req, res) {
         //4. Guardamos el token en una cookie segura
         res.cookie('token',token, {
             httpOnly: true, //evita que el token sea accesible dede js
-            secure: process.env.NODE_ENV === 'production', // Solo se envía en HTTPS en producción
+            secure: process.env.NODE_ENV === 'production', // Solo se envia en HTTPS en produccion
             maxAge: 3600000 // El token expira en 1 hora (en milisegundos)
         });
         //5. Redireccionamos al feed de publicaciones

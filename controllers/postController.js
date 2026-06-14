@@ -123,12 +123,12 @@ export async function resolverDenuncia(req, res) {
 
             res.json({ message: 'Las denuncias han sido desestimadas correctamente' });
         } else {
-            res.status(400).json({ error: 'Acción no válida. Se espera "bajar" o "desestimar"' });
+            res.status(400).json({ error: 'Accion no valida. Se espera "bajar" o "desestimar"' });
         }
 
     } catch (error) {
         res.status(500).json({ 
-            error: 'Error al procesar la resolución de la denuncia', 
+            error: 'Error al procesar la resolucion de la denuncia', 
             message: error.message 
         });
     }
