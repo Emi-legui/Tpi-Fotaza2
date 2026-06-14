@@ -7,7 +7,7 @@ import Valoracion from '../models/valoracion.js';
 import Comment from '../models/comment.js';
 import { verificarEstadoPublicacion } from '../controllers/postController.js';
 import { requiereAutenticacion } from '../middleware/authMiddleware.js';
-import upload from '../utils/upload.js';
+import upload from '../middleware/multer.js';
 import { aplicarMarcaDeAgua } from '../utils/watermark.js';
 
 const router = express.Router();
@@ -22,16 +22,20 @@ router.post('/create', requiereAutenticacion, upload.single('imagen'), async (re
             return res.status(400).render('create-post', { error: 'Debes subir una imagen para publicar.' });
         }
 
-        // Ruta de acceso estática
-        const imagenRuta = `/uploads/${req.file.filename}`;
-        const absoluteImagePath = req.file.path;
+        // --- CAMBIO CLOUDINARY AQUI ---
+        // req.file.path ahora contiene la URL permanente de Cloudinary (https://res.cloudinary.com/...)
+        const imagenRuta = req.file.path; 
+        const absoluteImagePath = req.file.path; 
 
-        // Aplicar marca de agua si es Copyright y tiene texto
+        // NOTA: CloudinaryStorage sube la imagen de forma directa a la nube.
+        // Si la funcin aplicarMarcaDeAgua procesaba un archivo local en disco,
+        // al estar en Render/Cloudinary no va a encontrar un archivo local tradicional.
         if (licencia === 'copyright' && marca_agua_texto) {
             try {
                 await aplicarMarcaDeAgua(absoluteImagePath, marca_agua_texto);
             } catch (err) {
                 console.error('Error al estampar marca de agua:', err);
+                
                 return res.status(500).render('create-post', { error: 'Error al procesar la imagen con marca de agua.' });
             }
         }
@@ -40,7 +44,7 @@ router.post('/create', requiereAutenticacion, upload.single('imagen'), async (re
         const nuevoPost = await Post.create({
             titulo,
             descripcion: descripcion || '',
-            imagen: imagenRuta,
+            imagen: imagenRuta, // Se guarda el link 'https://...' directo en la base de datos
             licencia: licencia || 'libre',
             marca_agua_texto: licencia === 'copyright' ? marca_agua_texto : null,
             id_autor
